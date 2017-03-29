@@ -1,21 +1,33 @@
 #!/bin/bash
 
+# install dependencies
 sudo yum -y update
 sudo yum install epel-release -y
 sudo yum install python -y
 sudo yum install nginx -y
+
+# stop nginx
 sudo systemctl stop nginx
+
+# install pip
 sudo curl https://bootstrap.pypa.io/get-pip.py | sudo python -
+
+# set up virtual env
 sudo pip install virtualenv
 mkdir ./sample-app
 mkdir ./sample-app/app
 virtualenv ./sample-app/sample-venv
 source ./sample-app/sample-venv/bin/activate
+
+# install gunicorn
 sudo pip install gunicorn
+
+# create wsgi.py script for gunicorn
 sudo echo """def application(env, start_response):
     start_response('200 OK', [('Content-Type', 'text/html')])
     return ['Hello World!']""" > wsgi.py
 
+# configure nginx
 sudo echo 'worker_processes 1;
 
 events {
@@ -56,7 +68,13 @@ http {
         }
     }
 }' | sudo tee /etc/nginx/nginx.conf
+
+# need this for RHEL linux distros
 sudo setsebool -P httpd_can_network_connect 1
+
+# start nginx
 sudo systemctl start nginx
+
+# start gunicorn listening to local interface
 sudo gunicorn -b 127.0.0.1:8080 wsgi &
 

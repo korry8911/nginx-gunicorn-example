@@ -11,3 +11,5 @@
 4: SSH into the EC2 instance with: `ssh -i ~/path/to/ec2-key.pem centos@ec2.domain.name.com`
 
 5: Run `setup.sh` from the EC2 instance with: `sudo sh setup.sh`
+
+6: After `setup.sh` completes, open a browser and navigate to `ec2.domain.name.com`. Should see `'Hello World'`
